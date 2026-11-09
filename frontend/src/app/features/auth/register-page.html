@@ -1,0 +1,18 @@
+<form class="card form narrow" [formGroup]="form" (ngSubmit)="submit()">
+  <p class="eyebrow">Identity and customer</p>
+  <h1>Create a shopper account</h1>
+  <p class="muted">Identity saves the login, then calls the customer service with Feign and opens a profile with the same email.</p>
+  <div class="fields">
+    <label>First name<input formControlName="firstName" /></label>
+    <label>Last name<input formControlName="lastName" /></label>
+    <label>Email<input type="email" formControlName="email" autocomplete="email" /></label>
+    <label>Mobile<input formControlName="mobile" /></label>
+    <label>Password<input type="password" formControlName="password" autocomplete="new-password" /></label>
+  </div>
+  <p class="muted">Password: 8 or more characters. Add a shipping address on the profile page after this.</p>
+  @if (error()) {
+    <p class="banner">{{ error() }}</p>
+  }
+  <button class="button" type="submit" [disabled]="saving()">{{ saving() ? 'Creating' : 'Create account' }}</button>
+  <a routerLink="/login">Already have an account</a>
+</form>

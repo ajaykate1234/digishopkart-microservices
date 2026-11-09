@@ -1,0 +1,78 @@
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Product service · port 8083</p>
+    <h1>Catalog</h1>
+    <p class="lede">Anyone can read this list. Staff and admin can add a product with one variant. Category and brand are columns on the product.</p>
+  </div>
+</section>
+
+<div class="filters">
+  <label>
+    Search
+    <input [value]="query()" (input)="query.set($any($event.target).value)" placeholder="Name, brand, or category" />
+  </label>
+  <button type="button" class="button ghost" (click)="load()">Refresh</button>
+</div>
+
+@if (error()) {
+  <p class="banner">{{ error() }}</p>
+}
+@if (notice()) {
+  <p class="banner ok">{{ notice() }}</p>
+}
+
+<div class="layout">
+  <section class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Brand</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Variants</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of visible(); track product.id) {
+          <tr>
+            <td>{{ product.productName }} <span class="muted">#{{ product.id }}</span></td>
+            <td>{{ product.brand }}</td>
+            <td>{{ product.productCategory }}</td>
+            <td>{{ product.productPrice }}</td>
+            <td>
+              @for (variant of product.variants; track variant.id) {
+                <span>{{ variant.name }}: {{ variant.value }}</span>
+              }
+              @if (product.variants.length === 0) {
+                <span class="muted">None</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5">No products yet.</td></tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  @if (canEdit()) {
+    <form class="card form" [formGroup]="form" (ngSubmit)="save()">
+      <h2>Add a product</h2>
+      <label>Name<input formControlName="productName" /></label>
+      <label>Brand<input formControlName="brand" /></label>
+      <label>Price<input type="number" formControlName="productPrice" /></label>
+      <label>
+        Category
+        <select formControlName="productCategory">
+          @for (category of categories; track category) {
+            <option [value]="category">{{ category }}</option>
+          }
+        </select>
+      </label>
+      <label>Variant name<input formControlName="variantName" /></label>
+      <label>Variant value<input formControlName="variantValue" /></label>
+      <button class="button" type="submit" [disabled]="saving()">{{ saving() ? 'Saving' : 'Save product' }}</button>
+    </form>
+  }
+</div>

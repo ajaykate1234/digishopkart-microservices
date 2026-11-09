@@ -1,0 +1,12 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_USER: digishopkart
+      MYSQL_PASSWORD: digishopkart
+      MYSQL_ROOT_PASSWORD: digishopkart
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./scripts/create-database.sql:/docker-entrypoint-initdb.d/01-databases.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci

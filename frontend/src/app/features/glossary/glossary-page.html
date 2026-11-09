@@ -1,0 +1,34 @@
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Plain language</p>
+    <h1>Technical terms</h1>
+    <p class="lede">Each term is tied to a place in this project. If a sentence and the code disagree, trust the code.</p>
+  </div>
+</section>
+
+<div class="filters">
+  <label>
+    Search
+    <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="jwt, repository, guard" />
+  </label>
+  <div class="chips">
+    @for (item of groups; track item) {
+      <button type="button" class="chip" [class.on]="group() === item" (click)="group.set(item)">{{ item }}</button>
+    }
+  </div>
+</div>
+
+@if (entries().length === 0) {
+  <p class="empty">No term matches that search.</p>
+} @else {
+  <div class="glossary">
+    @for (entry of entries(); track entry.term) {
+      <article class="card">
+        <p class="eyebrow">{{ entry.group }}</p>
+        <h2>{{ entry.term }}</h2>
+        <p>{{ entry.plain }}</p>
+        <p class="where">{{ entry.where }}</p>
+      </article>
+    }
+  </div>
+}

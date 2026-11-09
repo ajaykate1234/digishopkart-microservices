@@ -1,0 +1,57 @@
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Discount service · port 8084</p>
+    <h1>Discounts</h1>
+    <p class="lede">FLAT subtracts a rupee amount. PERCENTAGE subtracts that percent of the product total. Anyone can read the list. Only an admin can add one.</p>
+  </div>
+</section>
+
+@if (error()) {
+  <p class="banner">{{ error() }}</p>
+}
+@if (notice()) {
+  <p class="banner ok">{{ notice() }}</p>
+}
+
+<div class="layout">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Coupon</th>
+          <th>Type</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (discount of rows(); track discount.id) {
+          <tr>
+            <td>{{ discount.id }}</td>
+            <td>{{ discount.couponName }}</td>
+            <td>{{ discount.discountType }}</td>
+            <td>{{ discount.couponValue }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4">No discounts yet.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (isAdmin()) {
+    <form class="card form" [formGroup]="form" (ngSubmit)="save()">
+      <h2>Add a coupon</h2>
+      <label>Name<input formControlName="couponName" /></label>
+      <label>
+        Type
+        <select formControlName="discountType">
+          <option value="FLAT">FLAT</option>
+          <option value="PERCENTAGE">PERCENTAGE</option>
+        </select>
+      </label>
+      <label>Value<input type="number" formControlName="couponValue" /></label>
+      <button class="button" type="submit" [disabled]="saving()">{{ saving() ? 'Saving' : 'Save discount' }}</button>
+    </form>
+  }
+</div>

@@ -1,0 +1,41 @@
+<div class="shell" [class.nav-open]="navOpen()">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/">DigiShopKart</a>
+    <p class="brand-note">Gateway on 8088. Each module is its own service.</p>
+    <nav>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/glossary" routerLinkActive="active">Terms</a>
+      <a routerLink="/products" routerLinkActive="active">Products</a>
+      <a routerLink="/discounts" routerLinkActive="active">Discounts</a>
+      @if (signedIn()) {
+        <a routerLink="/orders" routerLinkActive="active">Orders</a>
+        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      }
+      @if (isAdmin()) {
+        <a routerLink="/customers" routerLinkActive="active">Customers</a>
+      }
+    </nav>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <button type="button" class="menu" (click)="navOpen.set(!navOpen())" aria-label="Open menu">Menu</button>
+      <p class="who">
+        @if (user(); as current) {
+          {{ current.fullName }} · {{ current.role }}
+        } @else {
+          Not signed in
+        }
+      </p>
+      <div class="row">
+        @if (user()) {
+          <button type="button" class="button ghost" (click)="signOut()">Sign out</button>
+        } @else {
+          <a class="button ghost" routerLink="/login">Sign in</a>
+        }
+      </div>
+    </header>
+    <main>
+      <router-outlet />
+    </main>
+  </div>
+</div>
