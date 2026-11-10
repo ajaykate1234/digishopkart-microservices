@@ -20,7 +20,7 @@ spring:
             - id: product
               uri: http://127.0.0.1:8083
               predicates:
-                - Path=/api/v1/products,/api/v1/products/**,/api/v1/variant,/api/v1/variant/**
+                - Path=/api/v1/products,/api/v1/products/**,/api/v1/catalog/**,/api/v1/variant,/api/v1/variant/**
             - id: discount
               uri: http://127.0.0.1:8084
               predicates:

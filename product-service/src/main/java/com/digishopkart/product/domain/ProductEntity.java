@@ -29,11 +29,17 @@ public class ProductEntity {
   @Column(name = "product_price", nullable = false, precision = 12, scale = 2)
   private BigDecimal productPrice;
 
+  @Column(nullable = false, precision = 12, scale = 2)
+  private BigDecimal mrp;
+
   @Column(name = "status", nullable = false, length = 16)
   private String productStatus;
 
   @Column(name = "product_category", nullable = false, length = 32)
   private String productCategory;
+
+  @Column(length = 180)
+  private String highlight;
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<VariantEntity> variants = new ArrayList<>();
@@ -66,6 +72,14 @@ public class ProductEntity {
     this.productPrice = productPrice;
   }
 
+  public BigDecimal getMrp() {
+    return mrp;
+  }
+
+  public void setMrp(BigDecimal mrp) {
+    this.mrp = mrp;
+  }
+
   public String getProductStatus() {
     return productStatus;
   }
@@ -80,6 +94,14 @@ public class ProductEntity {
 
   public void setProductCategory(String productCategory) {
     this.productCategory = productCategory;
+  }
+
+  public String getHighlight() {
+    return highlight;
+  }
+
+  public void setHighlight(String highlight) {
+    this.highlight = highlight;
   }
 
   public List<VariantEntity> getVariants() {

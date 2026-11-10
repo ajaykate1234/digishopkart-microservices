@@ -23,6 +23,18 @@
   "references": [
     {
       "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./projects/catalog/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/account/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/checkout/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/offers/tsconfig.app.json"
     }
   ]
 }

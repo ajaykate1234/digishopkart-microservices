@@ -7,10 +7,14 @@ A shop split into services so each module owns its tables. The browser talks onl
 | gateway | 8088 | none | Routes `/api/v1/**` |
 | identity-service | 8081 | digishopkart_identity | `users`, `roles`, JWT |
 | customer-service | 8082 | digishopkart_customer | `customers`, `customer_addresses` |
-| product-service | 8083 | digishopkart_product | `products`, `variants` |
+| product-service | 8083 | digishopkart_product | `products`, `variants`, `product_images` |
 | discount-service | 8084 | digishopkart_discount | `discounts` |
 | order-service | 8085 | digishopkart_order | `orders`, `order_items` |
-| Angular UI | 4217 | none | Calls the gateway through the dev proxy |
+| shell | 4217 | none | Hosts the shop and loads the other frontends |
+| catalog | 4218 | none | Product grid, filters, pictures, staff add-product |
+| account | 4219 | none | Profile and the admin customer list |
+| checkout | 4220 | none | Bag and place-order |
+| offers | 4221 | none | Coupons |
 
 Address stays inside the customer service. Variant stays inside the product service. An order stores `customer_id`, `discount_id`, and one `order_items` row per `product_id`. There is no foreign key across databases. On place-order, the order service calls the other three with Feign and checks that those ids exist.
 
@@ -56,22 +60,28 @@ java -jar order-service/target/order-service-0.2.0.jar
 java -jar gateway/target/gateway-0.2.0.jar
 ```
 
-Each command needs its own terminal. The UI:
+Each command needs its own terminal. The shop is a shell plus four microfrontends. Start all of them:
 
 ```bash
 cd frontend
 npm install
-npm start
+npm run start:all
 ```
 
-Open `http://127.0.0.1:4217`. The dev server proxies `/api` to the gateway on port 8088.
+Open `http://127.0.0.1:4217`. The shell proxies `/api` to the gateway on port 8088. Catalog is 4218, account 4219, checkout 4220, and offers 4221. The shell loads those apps with native federation, so they have to be running.
+
+Product pictures are stored as MySQL blobs in `product_images`, not inside the product JSON. The browser loads them from `GET /api/v1/products/{productId}/images/{imageId}`. Staff and admin upload jpeg, png, or webp files up to 5 MB. Seed products already have pictures.
+
+Catalog filters are query parameters on `GET /api/v1/products`: `q`, `category`, `brand`, `minPrice`, and `maxPrice`. `GET /api/v1/catalog/facets` returns the category and brand counts.
 
 ## What the screens do
 
+- The home page and catalog load live products, prices, MRP, and pictures.
+- Filters cover category, brand, price, and search.
 - Products and discounts can be read without signing in.
-- Staff and admin can add a product with one variant.
+- Staff and admin can add a product and upload a picture on the product page.
 - Admin can add a coupon and mark a customer inactive.
-- A signed-in shopper can add an address and place an order. The total applies a FLAT amount or a PERCENTAGE.
+- A signed-in shopper can add an address, keep a bag, and place an order. The total applies a FLAT amount or a PERCENTAGE.
 - Admin can move an order through `confirmed`, `placed`, `dispatched`, `outfordelivery`, `delivered`, and `cancelled`.
 
 ## Choices kept from the draft

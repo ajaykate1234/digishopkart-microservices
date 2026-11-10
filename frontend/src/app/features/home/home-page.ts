@@ -1,8 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ACCESS_ROWS } from '../../core/access';
-import { errorMessage } from '../../core/api-error';
+import { discountPercent, errorMessage, imageUrl, primaryImage, Product, ShopService } from '@digi/shared';
 
 @Component({
   selector: 'app-home-page',
@@ -10,22 +8,17 @@ import { errorMessage } from '../../core/api-error';
   templateUrl: './home-page.html',
 })
 export class HomePage implements OnInit {
-  private readonly http = inject(HttpClient);
-
-  protected readonly rows = ACCESS_ROWS;
-  protected readonly api = signal<'checking' | 'up' | 'down'>('checking');
-  protected readonly apiDetail = signal('Checking the API.');
+  private readonly shop = inject(ShopService);
+  protected readonly products = signal<Product[]>([]);
+  protected readonly error = signal<string | null>(null);
+  protected readonly imageUrl = imageUrl;
+  protected readonly primaryImage = primaryImage;
+  protected readonly discountPercent = discountPercent;
 
   ngOnInit(): void {
-    this.http.get<{ status: string; application: string }>('/api/health').subscribe({
-      next: (body) => {
-        this.api.set('up');
-        this.apiDetail.set(`${body.application} is up.`);
-      },
-      error: (error: unknown) => {
-        this.api.set('down');
-        this.apiDetail.set(errorMessage(error, 'The API did not answer.'));
-      },
+    this.shop.products().subscribe({
+      next: (rows) => this.products.set(rows.slice(0, 4)),
+      error: (error: unknown) => this.error.set(errorMessage(error, 'The catalog is not reachable.')),
     });
   }
 }

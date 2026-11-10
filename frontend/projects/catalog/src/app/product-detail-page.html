@@ -1,0 +1,49 @@
+<p><a routerLink="/catalog">Back to catalog</a></p>
+@if (error()) {
+  <p class="banner">{{ error() }}</p>
+}
+@if (notice()) {
+  <p class="banner ok">{{ notice() }}</p>
+}
+@if (product(); as item) {
+  <section class="detail">
+    <div>
+      @if (selectedImage(); as imageId) {
+        <img class="hero-photo" [src]="imageUrl(item.id, imageId)" [alt]="item.productName" />
+      } @else {
+        <div class="photo-fallback large">No photo yet</div>
+      }
+      <div class="thumbs">
+        @for (image of item.images; track image.id) {
+          <button type="button" (click)="selectedImage.set(image.id)">
+            <img [src]="imageUrl(item.id, image.id)" [alt]="image.fileName" />
+          </button>
+        }
+      </div>
+      @if (canUpload()) {
+        <label class="upload">Add another picture<input type="file" accept="image/jpeg,image/png,image/webp" (change)="upload($event)" /></label>
+      }
+    </div>
+    <div>
+      <p class="brand-line">{{ item.brand }}</p>
+      <h1>{{ item.productName }}</h1>
+      <p>{{ item.highlight }}</p>
+      <p class="price-line">
+        <strong>₹{{ item.productPrice }}</strong>
+        @if (discountPercent(item.productPrice, item.mrp); as off) {
+          @if (off > 0) {
+            <span class="mrp">₹{{ item.mrp }}</span>
+            <span class="off">{{ off }}% off</span>
+          }
+        }
+      </p>
+      <p class="muted">Category {{ item.productCategory }}</p>
+      <ul>
+        @for (variant of item.variants; track variant.id) {
+          <li>{{ variant.name }}: {{ variant.value }}</li>
+        }
+      </ul>
+      <button type="button" class="button" (click)="add()">Add to bag</button>
+    </div>
+  </section>
+}

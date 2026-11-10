@@ -1,67 +1,29 @@
-<section class="hero">
-  <p class="eyebrow">Separate services, one shop</p>
-  <h1>DigiShopKart</h1>
-  <p class="lede">
-    The browser talks only to the gateway. Customer, product, discount, and order each have their own process and their own MySQL database.
-    When you place an order, the order service asks the others over Feign, then stores the ids.
-  </p>
-  <p class="status" [class.up]="api() === 'up'" [class.down]="api() === 'down'">{{ apiDetail() }}</p>
-  <div class="row">
-    <a class="button" routerLink="/products">Open the catalog</a>
-    <a class="button ghost" routerLink="/glossary">Read the terms</a>
-  </div>
+<section class="hero shop-hero">
+  <p class="eyebrow">One shell, four microfrontends</p>
+  <h1>Shop the catalog</h1>
+  <p class="lede">Products, pictures, offers, and checkout each load from their own frontend. The pictures are stored as blobs in the product database.</p>
+  <a class="button" routerLink="/catalog">Browse all products</a>
+  @if (error()) { <p class="banner">{{ error() }}</p> }
 </section>
-
-<section class="grid three">
-  <article class="card">
-    <h2>Customer</h2>
-    <p>Name, email, mobile, and addresses. An address always belongs to one customer, so it stays in this service.</p>
-  </article>
-  <article class="card">
-    <h2>Product</h2>
-    <p>Name, brand, price, category, and variants. Brand and category are columns on the product, not separate master tables.</p>
-  </article>
-  <article class="card">
-    <h2>Order</h2>
-    <p>Customer id, discount id, and one line per product. The total is calculated here after Feign checks that those ids exist.</p>
-  </article>
-</section>
-
-<section class="card">
-  <h2>How one order moves</h2>
-  <ol class="steps">
-    <li>The screen calls the gateway at <code>/api/v1/orders</code>.</li>
-    <li>The gateway forwards the call, including the JWT, to the order service.</li>
-    <li>Order service uses a Feign client to read the customer, each product, and the discount.</li>
-    <li>Those services check the same JWT. A missing id comes back as 404.</li>
-    <li>Order service saves the order and the line items in its own database. There is no foreign key into the other databases.</li>
-  </ol>
-</section>
-
-<section class="card">
-  <h2>Who can do what</h2>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Action</th>
-          <th>Public</th>
-          <th>Customer</th>
-          <th>Staff</th>
-          <th>Admin</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of rows; track row.action) {
-          <tr>
-            <td>{{ row.action }}</td>
-            <td>{{ row.public ? 'Yes' : '—' }}</td>
-            <td>{{ row.customer ? 'Yes' : '—' }}</td>
-            <td>{{ row.staff ? 'Yes' : '—' }}</td>
-            <td>{{ row.admin ? 'Yes' : '—' }}</td>
-          </tr>
+<section class="product-grid">
+  @for (product of products(); track product.id) {
+    <article class="product-card">
+      <a [routerLink]="['/catalog', product.id]">
+        @if (primaryImage(product); as image) {
+          <img [src]="imageUrl(product.id, image.id)" [alt]="product.productName" />
         }
-      </tbody>
-    </table>
-  </div>
+      </a>
+      <p class="brand-line">{{ product.brand }}</p>
+      <h2><a [routerLink]="['/catalog', product.id]">{{ product.productName }}</a></h2>
+      <p class="price-line">
+        <strong>₹{{ product.productPrice }}</strong>
+        @if (discountPercent(product.productPrice, product.mrp); as off) {
+          @if (off > 0) {
+            <span class="mrp">₹{{ product.mrp }}</span>
+            <span class="off">{{ off }}% off</span>
+          }
+        }
+      </p>
+    </article>
+  }
 </section>

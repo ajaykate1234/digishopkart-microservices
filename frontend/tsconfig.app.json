@@ -3,7 +3,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": []
+    "types": [],
+    "paths": {
+      "@digi/shared": ["./projects/shared/src/public-api.ts"]
+    }
   },
   "include": [
     "src/**/*.ts"

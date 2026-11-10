@@ -20,7 +20,7 @@ public class SecurityConfig {
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return support.build(http, auth -> auth
         .requestMatchers("/api/v1/health").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/v1/products", "/api/v1/products/**", "/api/v1/variant", "/api/v1/variant/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/v1/products", "/api/v1/products/**", "/api/v1/catalog/**", "/api/v1/variant", "/api/v1/variant/**").permitAll()
         .requestMatchers("/api/v1/products", "/api/v1/products/**", "/api/v1/variant", "/api/v1/variant/**").hasAnyRole("ADMIN", "STAFF")
         .anyRequest().authenticated());
   }

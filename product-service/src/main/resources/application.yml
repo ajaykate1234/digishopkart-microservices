@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: product-service
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
   datasource:
     url: jdbc:mysql://localhost:3306/digishopkart_product?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${DB_USERNAME:digishopkart}

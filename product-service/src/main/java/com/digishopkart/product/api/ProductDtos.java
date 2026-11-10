@@ -1,5 +1,6 @@
 package com.digishopkart.product.api;
 
+import com.digishopkart.product.api.CatalogDtos.ImageResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +22,8 @@ public final class ProductDtos {
       @NotBlank String productName,
       @NotBlank String brand,
       @NotNull @PositiveOrZero BigDecimal productPrice,
+      @PositiveOrZero BigDecimal mrp,
+      String highlight,
       String productStatus,
       @NotBlank String productCategory,
       @Valid List<VariantRequest> variants
@@ -32,9 +35,12 @@ public final class ProductDtos {
       String productName,
       String brand,
       BigDecimal productPrice,
+      BigDecimal mrp,
+      String highlight,
       String productStatus,
       String productCategory,
-      List<VariantResponse> variants
+      List<VariantResponse> variants,
+      List<ImageResponse> images
   ) {
   }
 }

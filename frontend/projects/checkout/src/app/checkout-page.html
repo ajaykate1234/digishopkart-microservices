@@ -1,0 +1,60 @@
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Checkout microfrontend</p>
+    <h1>Bag and orders</h1>
+    <p class="lede">Placing an order asks the customer, product, and discount services through Feign.</p>
+  </div>
+</section>
+@if (error()) { <p class="banner">{{ error() }}</p> }
+@if (notice()) { <p class="banner ok">{{ notice() }}</p> }
+<div class="bag">
+  @for (line of cart.lines(); track line.productId) {
+    <article class="bag-line">
+      @if (line.imageId) {
+        <img [src]="imageUrl(line.productId, line.imageId)" [alt]="line.productName" />
+      }
+      <div>
+        <strong>{{ line.productName }}</strong>
+        <p class="muted">{{ line.brand }} · ₹{{ line.price }}</p>
+        <label>Qty <input type="number" min="0" [value]="line.quantity" (change)="cart.setQuantity(line.productId, +$any($event.target).value)" /></label>
+      </div>
+    </article>
+  } @empty { <p>Your bag is empty. Add a product from the catalog.</p> }
+</div>
+@if (cart.lines().length) {
+  <p class="price-line"><strong>Bag total ₹{{ total() }}</strong> before the coupon.</p>
+  <form class="card form" [formGroup]="form" (ngSubmit)="place()">
+    <label>Customer id<input type="number" formControlName="customerId" /></label>
+    <label>Coupon
+      <select formControlName="discountId">
+        <option [ngValue]="null">None</option>
+        @for (discount of discounts(); track discount.id) {
+          <option [ngValue]="discount.id">{{ discount.couponName }} · {{ discount.discountType }} {{ discount.couponValue }}</option>
+        }
+      </select>
+    </label>
+    <button class="button" type="submit" [disabled]="saving()">Place order</button>
+  </form>
+}
+<h2>Your orders</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Order</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+    <tbody>
+      @for (order of orders(); track order.orderId) {
+        <tr>
+          <td>#{{ order.orderId }}</td>
+          <td>@for (item of order.items; track item.id) { <div>{{ item.productName }}</div> }</td>
+          <td>₹{{ order.totalPrice }}</td>
+          <td>
+            @if (isAdmin()) {
+              <select [value]="order.orderStatus" (change)="changeStatus(order, $any($event.target).value)">
+                @for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }
+              </select>
+            } @else { {{ order.orderStatus }} }
+          </td>
+        </tr>
+      } @empty { <tr><td colspan="4">No orders yet.</td></tr> }
+    </tbody>
+  </table>
+</div>

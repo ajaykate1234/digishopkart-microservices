@@ -1,0 +1,6 @@
+{
+  "catalog": "http://127.0.0.1:4218/remoteEntry.json",
+  "account": "http://127.0.0.1:4219/remoteEntry.json",
+  "checkout": "http://127.0.0.1:4220/remoteEntry.json",
+  "offers": "http://127.0.0.1:4221/remoteEntry.json"
+}

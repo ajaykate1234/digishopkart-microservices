@@ -1,0 +1,97 @@
+<section class="catalog">
+  <aside class="filters">
+    <div class="filter-head">
+      <h2>Filters</h2>
+      <button type="button" class="text-button" (click)="clear()">Clear</button>
+    </div>
+    <h3>Category</h3>
+    @for (facet of facets()?.categories ?? []; track facet.name) {
+      <label class="check">
+        <input type="checkbox" [checked]="categories().includes(facet.name)" (change)="toggle(categories(), facet.name, 'category')" />
+        {{ facet.name }} <span class="muted">({{ facet.count }})</span>
+      </label>
+    }
+    <h3>Brand</h3>
+    @for (facet of facets()?.brands ?? []; track facet.name) {
+      <label class="check">
+        <input type="checkbox" [checked]="brands().includes(facet.name)" (change)="toggle(brands(), facet.name, 'brand')" />
+        {{ facet.name }} <span class="muted">({{ facet.count }})</span>
+      </label>
+    }
+    <h3>Price</h3>
+    <form class="price-filter" (submit)="$event.preventDefault(); applyPrice(min.value, max.value)">
+      <input #min type="number" [value]="minPrice() ?? ''" placeholder="Min" />
+      <input #max type="number" [value]="maxPrice() ?? ''" placeholder="Max" />
+      <button class="button" type="submit">Apply</button>
+    </form>
+  </aside>
+
+  <section>
+    <div class="page-head">
+      <div>
+        <p class="eyebrow">Catalog microfrontend</p>
+        <h1>{{ query() ? 'Results for “' + query() + '”' : 'All products' }}</h1>
+        <p class="muted">{{ products().length }} items. Pictures are loaded from the product service.</p>
+      </div>
+    </div>
+    @if (error()) {
+      <p class="banner">{{ error() }}</p>
+    }
+    @if (notice()) {
+      <p class="banner ok">{{ notice() }}</p>
+    }
+    @if (loading()) {
+      <p class="muted">Loading the catalog…</p>
+    }
+    @if (canEdit()) {
+      <form class="panel fields" [formGroup]="form" (ngSubmit)="save()">
+        <h2>Add a product</h2>
+        <label>Name <input formControlName="productName" /></label>
+        <label>Brand <input formControlName="brand" /></label>
+        <label>Price <input type="number" formControlName="productPrice" /></label>
+        <label>MRP <input type="number" formControlName="mrp" /></label>
+        <label>Highlight <input formControlName="highlight" /></label>
+        <label>Category
+          <select formControlName="productCategory">
+            @for (category of categoryOptions; track category) {
+              <option [value]="category">{{ category }}</option>
+            }
+          </select>
+        </label>
+        <label>Variant <input formControlName="variantName" /></label>
+        <label>Value <input formControlName="variantValue" /></label>
+        <button class="button" type="submit" [disabled]="saving()">Save product</button>
+      </form>
+    }
+    <div class="product-grid">
+      @for (product of products(); track product.id) {
+        <article class="product-card">
+          <a [routerLink]="['/catalog', product.id]">
+            @if (primaryImage(product); as image) {
+              <img [src]="imageUrl(product.id, image.id)" [alt]="product.productName" />
+            } @else {
+              <div class="photo-fallback">No photo</div>
+            }
+          </a>
+          <p class="brand-line">{{ product.brand }}</p>
+          <h2><a [routerLink]="['/catalog', product.id]">{{ product.productName }}</a></h2>
+          <p class="muted">{{ product.highlight }}</p>
+          <p class="price-line">
+            <strong>₹{{ product.productPrice }}</strong>
+            @if (discountPercent(product.productPrice, product.mrp); as off) {
+              @if (off > 0) {
+                <span class="mrp">₹{{ product.mrp }}</span>
+                <span class="off">{{ off }}% off</span>
+              }
+            }
+          </p>
+          <button type="button" class="button" (click)="add(product)">Add to bag</button>
+        </article>
+      } @empty {
+        @if (!loading()) {
+          <p>No products match these filters.</p>
+        }
+      }
+    </div>
+  </section>
+</section>

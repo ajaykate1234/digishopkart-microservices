@@ -1,0 +1,26 @@
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Offers microfrontend</p>
+    <h1>Coupons</h1>
+    <p class="lede">FLAT takes rupees off the order. PERCENTAGE takes that percent off the product total.</p>
+  </div>
+</section>
+@if (error()) { <p class="banner">{{ error() }}</p> }
+@if (notice()) { <p class="banner ok">{{ notice() }}</p> }
+<div class="offer-grid">
+  @for (discount of rows(); track discount.id) {
+    <article class="offer-card">
+      <h2>{{ discount.couponName }}</h2>
+      <p>{{ discount.discountType }} · {{ discount.couponValue }}</p>
+    </article>
+  } @empty { <p>No coupons yet.</p> }
+</div>
+@if (isAdmin()) {
+  <form class="card form" [formGroup]="form" (ngSubmit)="save()">
+    <h2>Add a coupon</h2>
+    <label>Name<input formControlName="couponName" /></label>
+    <label>Type<select formControlName="discountType"><option value="FLAT">FLAT</option><option value="PERCENTAGE">PERCENTAGE</option></select></label>
+    <label>Value<input type="number" formControlName="couponValue" /></label>
+    <button class="button" type="submit" [disabled]="saving()">Save coupon</button>
+  </form>
+}

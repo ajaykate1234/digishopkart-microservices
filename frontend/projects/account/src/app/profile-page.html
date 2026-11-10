@@ -1,0 +1,35 @@
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Account microfrontend</p>
+    <h1>Your profile</h1>
+  </div>
+</section>
+@if (error()) { <p class="banner">{{ error() }}</p> }
+@if (notice()) { <p class="banner ok">{{ notice() }}</p> }
+@if (customer(); as current) {
+  <section class="card">
+    <h2>{{ current.firstName }} {{ current.lastName }}</h2>
+    <p>{{ current.email }} · {{ current.mobile }} · {{ current.customerStatus }}</p>
+    <ul>
+      @for (address of current.customerAddress; track address.id) {
+        <li>{{ address.addressType }} — {{ address.houseOrBuilding }}, {{ address.area }}, {{ address.town }} {{ address.pinCode }}</li>
+      } @empty { <li>No address yet.</li> }
+    </ul>
+  </section>
+  <form class="card form" [formGroup]="form" (ngSubmit)="save()">
+    <h2>Add an address</h2>
+    <div class="fields">
+      <label>Type<select formControlName="addressType"><option value="shipping">shipping</option><option value="billing">billing</option></select></label>
+      <label>Full name<input formControlName="customerFullName" /></label>
+      <label>House<input formControlName="houseOrBuilding" /></label>
+      <label>Area<input formControlName="area" /></label>
+      <label>Town<input formControlName="town" /></label>
+      <label>State<input formControlName="state" /></label>
+      <label>Country<input formControlName="country" /></label>
+      <label>PIN<input type="number" formControlName="pinCode" /></label>
+      <label>Mobile<input formControlName="mobile" /></label>
+      <label>Landmark<input formControlName="landmark" /></label>
+    </div>
+    <button class="button" type="submit" [disabled]="saving()">Save address</button>
+  </form>
+}

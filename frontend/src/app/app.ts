@@ -1,7 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
-import { SessionStore } from './core/session.store';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { CartStore, SessionStore } from '@digi/shared';
 
 @Component({
   selector: 'app-root',
@@ -10,17 +9,17 @@ import { SessionStore } from './core/session.store';
 })
 export class App {
   private readonly session = inject(SessionStore);
+  private readonly cart = inject(CartStore);
   private readonly router = inject(Router);
 
-  protected readonly navOpen = signal(false);
+  protected readonly query = signal('');
   protected readonly user = this.session.user;
   protected readonly signedIn = this.session.signedIn;
   protected readonly isAdmin = computed(() => this.user()?.role === 'ADMIN');
+  protected readonly cartCount = this.cart.count;
 
-  constructor() {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.navOpen.set(false);
-    });
+  protected search(): void {
+    void this.router.navigate(['/catalog'], { queryParams: { q: this.query() || null } });
   }
 
   protected signOut(): void {
