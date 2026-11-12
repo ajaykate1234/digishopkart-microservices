@@ -3,10 +3,13 @@ package com.digishopkart.product.repo;
 import com.digishopkart.product.domain.ProductEntity;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
+
+  Optional<ProductEntity> findFirstByProductName(String productName);
 
   @Query("""
       select distinct p from ProductEntity p
