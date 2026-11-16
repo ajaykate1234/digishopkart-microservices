@@ -79,6 +79,7 @@ export class CatalogPage implements OnInit {
       brand: this.brands(),
       minPrice: this.minPrice(),
       maxPrice: this.maxPrice(),
+      includeInactive: this.canEdit(),
     }).subscribe({
       next: (rows) => {
         this.products.set(rows);
@@ -164,6 +165,6 @@ export class CatalogPage implements OnInit {
       price: product.productPrice,
       imageId: image?.id ?? null,
     });
-    this.notice.set(`${product.productName} added to the bag.`);
+    this.notice.set(`${product.productName} is in the bag. Open the bag to choose a coupon and place the order.`);
   }
 }

@@ -23,8 +23,13 @@
 </div>
 @if (cart.lines().length) {
   <p class="price-line"><strong>Bag total ₹{{ total() }}</strong> before the coupon.</p>
+  @if (!signedIn()) {
+    <p class="banner">Sign in to choose a coupon and place this order. <a routerLink="/login">Sign in</a></p>
+  } @else {
   <form class="card form" [formGroup]="form" (ngSubmit)="place()">
-    <label>Customer id<input type="number" formControlName="customerId" /></label>
+    @if (needsCustomerId()) {
+      <label>Customer id<input type="number" formControlName="customerId" /></label>
+    }
     <label>Coupon
       <select formControlName="discountId">
         <option [ngValue]="null">None</option>
@@ -35,7 +40,9 @@
     </label>
     <button class="button" type="submit" [disabled]="saving()">Place order</button>
   </form>
+  }
 }
+@if (signedIn()) {
 <h2>Your orders</h2>
 <div class="table-wrap">
   <table>
@@ -51,10 +58,16 @@
               <select [value]="order.orderStatus" (change)="changeStatus(order, $any($event.target).value)">
                 @for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }
               </select>
-            } @else { {{ order.orderStatus }} }
+            } @else {
+              {{ order.orderStatus }}
+              @if (order.orderStatus !== 'delivered' && order.orderStatus !== 'cancelled') {
+                <button type="button" class="text-button" (click)="cancel(order)">Cancel</button>
+              }
+            }
           </td>
         </tr>
       } @empty { <tr><td colspan="4">No orders yet.</td></tr> }
     </tbody>
   </table>
 </div>
+}

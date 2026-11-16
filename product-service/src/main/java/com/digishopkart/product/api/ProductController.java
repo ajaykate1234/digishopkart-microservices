@@ -46,9 +46,10 @@ public class ProductController {
       @RequestParam(required = false) List<String> category,
       @RequestParam(required = false) List<String> brand,
       @RequestParam(required = false) BigDecimal minPrice,
-      @RequestParam(required = false) BigDecimal maxPrice
+      @RequestParam(required = false) BigDecimal maxPrice,
+      @RequestParam(required = false, defaultValue = "false") boolean includeInactive
   ) {
-    return products.search(q, category, brand, minPrice, maxPrice);
+    return products.search(q, category, brand, minPrice, maxPrice, includeInactive);
   }
 
   @GetMapping("/api/v1/catalog/facets")
@@ -95,6 +96,11 @@ public class ProductController {
     return products.update(productId, request);
   }
 
+  @DeleteMapping("/api/v1/products/{productId}")
+  public void delete(@PathVariable Integer productId) {
+    products.delete(productId);
+  }
+
   @GetMapping("/api/v1/variant/{productId}")
   public List<VariantResponse> variants(@PathVariable Integer productId) {
     return products.variantsFor(productId);
@@ -108,5 +114,10 @@ public class ProductController {
   @PutMapping("/api/v1/variant/item/{variantId}")
   public VariantResponse updateVariant(@PathVariable Integer variantId, @Valid @RequestBody VariantRequest request) {
     return products.updateVariant(variantId, request);
+  }
+
+  @DeleteMapping("/api/v1/variant/item/{variantId}")
+  public void deleteVariant(@PathVariable Integer variantId) {
+    products.deleteVariant(variantId);
   }
 }

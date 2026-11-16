@@ -1,10 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CartStore, Discount, errorMessage, imageUrl, ORDER_STATUSES, SessionStore, ShopOrder, ShopService } from '@digi/shared';
 
 @Component({
   selector: 'app-checkout-page',
-  imports: [ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule, RouterLink],
   templateUrl: './checkout-page.html',
 })
 export class CheckoutPage implements OnInit {
@@ -19,6 +20,11 @@ export class CheckoutPage implements OnInit {
   protected readonly saving = signal(false);
   protected readonly imageUrl = imageUrl;
   protected readonly isAdmin = () => this.session.user()?.role === 'ADMIN';
+  protected readonly signedIn = () => this.session.signedIn();
+  protected readonly needsCustomerId = () => {
+    const role = this.session.user()?.role;
+    return role === 'ADMIN' || role === 'STAFF';
+  };
   protected readonly form = new FormGroup({
     customerId: new FormControl<number | null>(null, { validators: [Validators.required] }),
     discountId: new FormControl<number | null>(null),
@@ -43,14 +49,32 @@ export class CheckoutPage implements OnInit {
   }
 
   protected loadOrders(): void {
+    if (!this.session.signedIn()) {
+      this.orders.set([]);
+      return;
+    }
     this.shop.orders().subscribe({
       next: (rows) => this.orders.set(rows),
       error: (error: unknown) => this.error.set(errorMessage(error, 'Could not load orders.')),
     });
   }
 
+  protected cancel(order: ShopOrder): void {
+    this.shop.updateOrderStatus(order.orderId, 'cancelled').subscribe({
+      next: () => {
+        this.notice.set(`Order ${order.orderId} cancelled.`);
+        this.loadOrders();
+      },
+      error: (error: unknown) => this.error.set(errorMessage(error, 'Could not cancel the order.')),
+    });
+  }
+
   protected place(): void {
     const lines = this.cart.lines();
+    if (!this.signedIn()) {
+      this.error.set('Sign in as a customer before placing the order.');
+      return;
+    }
     if (this.form.invalid || lines.length === 0) {
       this.error.set('Choose a customer and add at least one product.');
       return;

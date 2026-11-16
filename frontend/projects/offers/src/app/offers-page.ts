@@ -14,6 +14,7 @@ export class OffersPage implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly notice = signal<string | null>(null);
   protected readonly saving = signal(false);
+  protected readonly editingId = signal<number | null>(null);
   protected readonly isAdmin = () => this.session.user()?.role === 'ADMIN';
   protected readonly form = new FormGroup({
     couponName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -32,23 +33,53 @@ export class OffersPage implements OnInit {
     });
   }
 
+  protected edit(discount: Discount): void {
+    this.editingId.set(discount.id);
+    this.form.reset({
+      couponName: discount.couponName,
+      discountType: discount.discountType,
+      couponValue: discount.couponValue,
+    });
+  }
+
+  protected cancelEdit(): void {
+    this.editingId.set(null);
+    this.form.reset({ couponName: '', discountType: 'FLAT', couponValue: 0 });
+  }
+
   protected save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    const body = this.form.getRawValue();
+    const id = this.editingId();
     this.saving.set(true);
-    this.shop.createDiscount(this.form.getRawValue()).subscribe({
+    const request = id == null ? this.shop.createDiscount(body) : this.shop.updateDiscount(id, body);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
-        this.notice.set('Offer saved.');
-        this.form.reset({ couponName: '', discountType: 'FLAT', couponValue: 0 });
+        this.notice.set(id == null ? 'Offer saved.' : 'Offer updated.');
+        this.cancelEdit();
         this.load();
       },
       error: (error: unknown) => {
         this.saving.set(false);
         this.error.set(errorMessage(error, 'Could not save the offer.'));
       },
+    });
+  }
+
+  protected remove(discount: Discount): void {
+    this.shop.deleteDiscount(discount.id).subscribe({
+      next: () => {
+        this.notice.set(`${discount.couponName} removed.`);
+        if (this.editingId() === discount.id) {
+          this.cancelEdit();
+        }
+        this.load();
+      },
+      error: (error: unknown) => this.error.set(errorMessage(error, 'Could not delete the offer.')),
     });
   }
 }

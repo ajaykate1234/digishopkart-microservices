@@ -7,17 +7,31 @@
 @if (error()) { <p class="banner">{{ error() }}</p> }
 @if (notice()) { <p class="banner ok">{{ notice() }}</p> }
 @if (customer(); as current) {
+  <form class="card form" [formGroup]="profile" (ngSubmit)="saveProfile()">
+    <h2>Profile</h2>
+    <p class="muted">{{ current.customerStatus }}</p>
+    <div class="fields">
+      <label>First name<input formControlName="firstName" /></label>
+      <label>Last name<input formControlName="lastName" /></label>
+      <label>Email<input formControlName="email" /></label>
+      <label>Mobile<input formControlName="mobile" /></label>
+    </div>
+    <button class="button" type="submit" [disabled]="saving()">Save profile</button>
+  </form>
   <section class="card">
-    <h2>{{ current.firstName }} {{ current.lastName }}</h2>
-    <p>{{ current.email }} · {{ current.mobile }} · {{ current.customerStatus }}</p>
+    <h2>Addresses</h2>
     <ul>
       @for (address of current.customerAddress; track address.id) {
-        <li>{{ address.addressType }} — {{ address.houseOrBuilding }}, {{ address.area }}, {{ address.town }} {{ address.pinCode }}</li>
+        <li>
+          {{ address.addressType }} — {{ address.houseOrBuilding }}, {{ address.area }}, {{ address.town }} {{ address.pinCode }}
+          <button type="button" class="button ghost" (click)="editAddress(address)">Edit</button>
+          <button type="button" class="text-button" (click)="removeAddress(address.id)">Delete</button>
+        </li>
       } @empty { <li>No address yet.</li> }
     </ul>
   </section>
   <form class="card form" [formGroup]="form" (ngSubmit)="save()">
-    <h2>Add an address</h2>
+    <h2>{{ editingAddressId() == null ? 'Add an address' : 'Update address' }}</h2>
     <div class="fields">
       <label>Type<select formControlName="addressType"><option value="shipping">shipping</option><option value="billing">billing</option></select></label>
       <label>Full name<input formControlName="customerFullName" /></label>
@@ -31,5 +45,8 @@
       <label>Landmark<input formControlName="landmark" /></label>
     </div>
     <button class="button" type="submit" [disabled]="saving()">Save address</button>
+    @if (editingAddressId() != null) {
+      <button class="button ghost" type="button" (click)="cancelAddress()">Cancel</button>
+    }
   </form>
 }

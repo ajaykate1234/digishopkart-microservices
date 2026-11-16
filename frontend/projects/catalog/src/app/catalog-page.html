@@ -38,7 +38,7 @@
       <p class="banner">{{ error() }}</p>
     }
     @if (notice()) {
-      <p class="banner ok">{{ notice() }}</p>
+      <p class="banner ok">{{ notice() }} <a routerLink="/checkout">Open the bag</a></p>
     }
     @if (loading()) {
       <p class="muted">Loading the catalog…</p>
@@ -76,6 +76,9 @@
           <p class="brand-line">{{ product.brand }}</p>
           <h2><a [routerLink]="['/catalog', product.id]">{{ product.productName }}</a></h2>
           <p class="muted">{{ product.highlight }}</p>
+          @if (product.productStatus !== 'active') {
+            <p class="muted">Hidden from customers ({{ product.productStatus }})</p>
+          }
           <p class="price-line">
             <strong>₹{{ product.productPrice }}</strong>
             @if (discountPercent(product.productPrice, product.mrp); as off) {

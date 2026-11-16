@@ -27,4 +27,6 @@ public interface ProductImageRepository extends JpaRepository<ProductImageEntity
   void clearPrimary(Integer productId);
 
   int countByProductId(Integer productId);
+
+  void deleteByProduct_Id(Integer productId);
 }

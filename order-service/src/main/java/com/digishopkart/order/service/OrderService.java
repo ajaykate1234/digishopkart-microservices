@@ -111,15 +111,20 @@ public class OrderService {
 
   @Transactional
   public OrderResponse updateStatus(Integer orderId, String status) {
-    if (!CurrentUser.hasRole("ADMIN")) {
-      throw new AccessDeniedException("status");
-    }
     String next = status == null ? "" : status.trim().toLowerCase();
     if (!STATUSES.contains(next)) {
       throw new ConflictException("orderStatus must be one of " + STATUSES + ".");
     }
     OrderEntity order = require(orderId);
-    order.setOrderStatus(next);
+    boolean admin = CurrentUser.hasRole("ADMIN");
+    boolean owner = order.getCustomerEmail().equalsIgnoreCase(CurrentUser.require().getUsername());
+    if (admin) {
+      order.setOrderStatus(next);
+    } else if (owner && "cancelled".equals(next) && !"delivered".equals(order.getOrderStatus())) {
+      order.setOrderStatus(next);
+    } else {
+      throw new AccessDeniedException("status");
+    }
     order.setUpdatedAt(Instant.now().toString());
     return toResponse(order);
   }

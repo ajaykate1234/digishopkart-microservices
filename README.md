@@ -76,13 +76,13 @@ Catalog filters are query parameters on `GET /api/v1/products`: `q`, `category`,
 
 ## What the screens do
 
-- The home page and catalog load live products, prices, MRP, and pictures.
-- Filters cover category, brand, price, and search.
-- Products and discounts can be read without signing in.
-- Staff and admin can add a product and upload a picture on the product page.
-- Admin can add a coupon and mark a customer inactive.
-- A signed-in shopper can add an address, keep a bag, and place an order. The total applies a FLAT amount or a PERCENTAGE.
-- Admin can move an order through `confirmed`, `placed`, `dispatched`, `outfordelivery`, `delivered`, and `cancelled`.
+- The home page and catalog load live products, prices, MRP, and pictures. Add to bag works from both, then Bag opens checkout.
+- Filters cover category, brand, price, and search. Open a product, add it to the bag, pick a coupon, and place the order.
+- Products and discounts can be read without signing in. The bag can be filled before sign-in. Placing the order needs a customer login.
+- Staff and admin add a product on the catalog page. On the product page they update it, hide it (`inactive`), delete it, and add, change, or remove variants and pictures. Staff also see hidden products in the catalog.
+- Admin creates, edits, and deletes coupons. Admin edits a customer or marks the account inactive. New customers still come from Register.
+- A signed-in shopper updates their profile and adds, edits, or deletes addresses.
+- Admin moves an order through `confirmed`, `placed`, `dispatched`, `outfordelivery`, `delivered`, and `cancelled`. The customer who placed it can cancel it until it is delivered.
 
 ## Choices kept from the draft
 

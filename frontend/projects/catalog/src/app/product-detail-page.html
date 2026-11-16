@@ -3,7 +3,7 @@
   <p class="banner">{{ error() }}</p>
 }
 @if (notice()) {
-  <p class="banner ok">{{ notice() }}</p>
+  <p class="banner ok">{{ notice() }} <a routerLink="/checkout">Open the bag</a></p>
 }
 @if (product(); as item) {
   <section class="detail">
@@ -18,9 +18,12 @@
           <button type="button" (click)="selectedImage.set(image.id)">
             <img [src]="imageUrl(item.id, image.id)" [alt]="image.fileName" />
           </button>
+          @if (canEdit()) {
+            <button type="button" class="text-button" (click)="removeImage(image.id)">Remove photo</button>
+          }
         }
       </div>
-      @if (canUpload()) {
+      @if (canEdit()) {
         <label class="upload">Add another picture<input type="file" accept="image/jpeg,image/png,image/webp" (change)="upload($event)" /></label>
       }
     </div>
@@ -37,13 +40,57 @@
           }
         }
       </p>
-      <p class="muted">Category {{ item.productCategory }}</p>
+      <p class="muted">Category {{ item.productCategory }} · {{ item.productStatus }}</p>
       <ul>
         @for (variant of item.variants; track variant.id) {
-          <li>{{ variant.name }}: {{ variant.value }}</li>
+          <li>
+            @if (canEdit()) {
+              <input [value]="variant.name" #variantName />
+              <input [value]="variant.value" #variantValue />
+              <button type="button" class="button ghost" (click)="saveVariant(variant, variantName.value, variantValue.value)">Save</button>
+              <button type="button" class="text-button" (click)="removeVariant(variant.id)">Remove</button>
+            } @else {
+              {{ variant.name }}: {{ variant.value }}
+            }
+          </li>
         }
       </ul>
       <button type="button" class="button" (click)="add()">Add to bag</button>
     </div>
   </section>
+  @if (canEdit()) {
+    <form class="card form" [formGroup]="form" (ngSubmit)="save()">
+      <h2>Update product</h2>
+      <div class="fields">
+        <label>Name<input formControlName="productName" /></label>
+        <label>Brand<input formControlName="brand" /></label>
+        <label>Price<input type="number" formControlName="productPrice" /></label>
+        <label>MRP<input type="number" formControlName="mrp" /></label>
+        <label>Highlight<input formControlName="highlight" /></label>
+        <label>Category
+          <select formControlName="productCategory">
+            @for (category of categoryOptions; track category) {
+              <option [value]="category">{{ category }}</option>
+            }
+          </select>
+        </label>
+        <label>Status
+          <select formControlName="productStatus">
+            <option value="active">active</option>
+            <option value="inactive">inactive</option>
+          </select>
+        </label>
+      </div>
+      <button class="button" type="submit" [disabled]="saving()">Save changes</button>
+      <button class="button ghost" type="button" (click)="remove()">Delete product</button>
+    </form>
+    <form class="card form" [formGroup]="variantForm" (ngSubmit)="addVariant()">
+      <h2>Add a variant</h2>
+      <div class="fields">
+        <label>Name<input formControlName="name" /></label>
+        <label>Value<input formControlName="value" /></label>
+      </div>
+      <button class="button" type="submit">Add variant</button>
+    </form>
+  }
 }

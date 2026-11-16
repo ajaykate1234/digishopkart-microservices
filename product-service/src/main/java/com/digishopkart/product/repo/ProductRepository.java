@@ -14,7 +14,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
   @Query("""
       select distinct p from ProductEntity p
       left join fetch p.variants
-      where p.productStatus = :status
+      where (:status is null or p.productStatus = :status)
         and (:q is null or lower(p.productName) like lower(concat('%', :q, '%'))
              or lower(p.brand) like lower(concat('%', :q, '%'))
              or lower(p.highlight) like lower(concat('%', :q, '%')))

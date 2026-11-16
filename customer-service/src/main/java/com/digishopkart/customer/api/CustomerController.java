@@ -8,6 +8,7 @@ import com.digishopkart.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,5 +68,10 @@ public class CustomerController {
   @PutMapping("/api/v1/customerAddress/{addressId}")
   public AddressResponse updateAddress(@PathVariable Integer addressId, @Valid @RequestBody AddressRequest request) {
     return customers.updateAddress(addressId, request);
+  }
+
+  @DeleteMapping("/api/v1/customerAddress/{addressId}")
+  public void deleteAddress(@PathVariable Integer addressId) {
+    customers.deleteAddress(addressId);
   }
 }

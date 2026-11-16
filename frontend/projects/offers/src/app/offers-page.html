@@ -2,7 +2,7 @@
   <div>
     <p class="eyebrow">Offers microfrontend</p>
     <h1>Coupons</h1>
-    <p class="lede">FLAT takes rupees off the order. PERCENTAGE takes that percent off the product total.</p>
+    <p class="lede">FLAT takes rupees off the order. PERCENTAGE takes that percent off the product total. Pick one in the bag when you place an order.</p>
   </div>
 </section>
 @if (error()) { <p class="banner">{{ error() }}</p> }
@@ -12,15 +12,22 @@
     <article class="offer-card">
       <h2>{{ discount.couponName }}</h2>
       <p>{{ discount.discountType }} · {{ discount.couponValue }}</p>
+      @if (isAdmin()) {
+        <button type="button" class="button ghost" (click)="edit(discount)">Edit</button>
+        <button type="button" class="text-button" (click)="remove(discount)">Delete</button>
+      }
     </article>
   } @empty { <p>No coupons yet.</p> }
 </div>
 @if (isAdmin()) {
   <form class="card form" [formGroup]="form" (ngSubmit)="save()">
-    <h2>Add a coupon</h2>
+    <h2>{{ editingId() == null ? 'Add a coupon' : 'Update coupon' }}</h2>
     <label>Name<input formControlName="couponName" /></label>
     <label>Type<select formControlName="discountType"><option value="FLAT">FLAT</option><option value="PERCENTAGE">PERCENTAGE</option></select></label>
     <label>Value<input type="number" formControlName="couponValue" /></label>
-    <button class="button" type="submit" [disabled]="saving()">Save coupon</button>
+    <button class="button" type="submit" [disabled]="saving()">{{ editingId() == null ? 'Save coupon' : 'Save changes' }}</button>
+    @if (editingId() != null) {
+      <button class="button ghost" type="button" (click)="cancelEdit()">Cancel</button>
+    }
   </form>
 }

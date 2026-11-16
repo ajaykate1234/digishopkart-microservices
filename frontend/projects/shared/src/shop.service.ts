@@ -8,6 +8,7 @@ export interface ProductQuery {
   brand?: string[];
   minPrice?: number | null;
   maxPrice?: number | null;
+  includeInactive?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -31,6 +32,9 @@ export class ShopService {
     if (query.maxPrice != null) {
       params = params.set('maxPrice', query.maxPrice);
     }
+    if (query.includeInactive) {
+      params = params.set('includeInactive', 'true');
+    }
     return this.http.get<Product[]>('/api/v1/products', { params });
   }
 
@@ -40,6 +44,30 @@ export class ShopService {
 
   createProduct(body: unknown) {
     return this.http.post<Product>('/api/v1/products', body);
+  }
+
+  updateProduct(id: number, body: unknown) {
+    return this.http.put<Product>(`/api/v1/products/${id}`, body);
+  }
+
+  deleteProduct(id: number) {
+    return this.http.delete<void>(`/api/v1/products/${id}`);
+  }
+
+  deleteImage(productId: number, imageId: number) {
+    return this.http.delete<void>(`/api/v1/products/${productId}/images/${imageId}`);
+  }
+
+  addVariant(productId: number, body: unknown) {
+    return this.http.post(`/api/v1/variant/${productId}`, body);
+  }
+
+  updateVariant(variantId: number, body: unknown) {
+    return this.http.put(`/api/v1/variant/item/${variantId}`, body);
+  }
+
+  deleteVariant(variantId: number) {
+    return this.http.delete<void>(`/api/v1/variant/item/${variantId}`);
   }
 
   facets() {
@@ -69,12 +97,28 @@ export class ShopService {
     return this.http.post('/api/v1/customerAddress', body);
   }
 
+  updateAddress(addressId: number, body: unknown) {
+    return this.http.put(`/api/v1/customerAddress/${addressId}`, body);
+  }
+
+  deleteAddress(addressId: number) {
+    return this.http.delete<void>(`/api/v1/customerAddress/${addressId}`);
+  }
+
   discounts() {
     return this.http.get<Discount[]>('/api/v1/discounts');
   }
 
   createDiscount(body: unknown) {
     return this.http.post<Discount>('/api/v1/discounts', body);
+  }
+
+  updateDiscount(id: number, body: unknown) {
+    return this.http.put<Discount>(`/api/v1/discounts/${id}`, body);
+  }
+
+  deleteDiscount(id: number) {
+    return this.http.delete<void>(`/api/v1/discounts/${id}`);
   }
 
   orders() {

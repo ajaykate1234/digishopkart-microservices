@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +59,14 @@ public class DiscountController {
     DiscountEntity discount = require(discountId);
     apply(discount, request);
     return toResponse(discount);
+  }
+
+  @DeleteMapping("/api/v1/discounts/{discountId}")
+  public void delete(@PathVariable Integer discountId) {
+    if (!discounts.existsById(discountId)) {
+      throw new NotFoundException("Discount " + discountId + " was not found.");
+    }
+    discounts.deleteById(discountId);
   }
 
   private DiscountEntity require(Integer id) {

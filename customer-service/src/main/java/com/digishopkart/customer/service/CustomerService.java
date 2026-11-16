@@ -105,6 +105,14 @@ public class CustomerService {
     return toAddress(address);
   }
 
+  @Transactional
+  public void deleteAddress(Integer addressId) {
+    CustomerAddressEntity address = addresses.findById(addressId)
+        .orElseThrow(() -> new NotFoundException("Address " + addressId + " was not found."));
+    assertCanWrite(address.getCustomer());
+    addresses.delete(address);
+  }
+
   private void apply(CustomerEntity customer, CustomerRequest request, String email) {
     customer.setFirstName(request.firstName().trim());
     customer.setLastName(request.lastName().trim());

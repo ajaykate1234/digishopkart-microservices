@@ -2,6 +2,7 @@
   <div>
     <p class="eyebrow">Account microfrontend</p>
     <h1>Customers</h1>
+    <p class="lede">New customers are created from Register. Update a row here, or mark it inactive to stop that account from shopping.</p>
   </div>
   <button type="button" class="button ghost" (click)="load()">Refresh</button>
 </section>
@@ -16,9 +17,30 @@
           <td>{{ customer.firstName }} {{ customer.lastName }}</td>
           <td>{{ customer.email }}</td>
           <td>{{ customer.customerStatus }}</td>
-          <td><button type="button" class="button ghost" (click)="toggle(customer)">{{ customer.customerStatus === 'active' ? 'Mark inactive' : 'Mark active' }}</button></td>
+          <td>
+            <button type="button" class="button ghost" (click)="edit(customer)">Edit</button>
+            <button type="button" class="button ghost" (click)="toggle(customer)">{{ customer.customerStatus === 'active' ? 'Mark inactive' : 'Mark active' }}</button>
+          </td>
         </tr>
       } @empty { <tr><td colspan="4">No customers yet.</td></tr> }
     </tbody>
   </table>
 </div>
+@if (editingId() != null) {
+  <form class="card form" [formGroup]="form" (ngSubmit)="save()">
+    <h2>Update customer</h2>
+    <div class="fields">
+      <label>First name<input formControlName="firstName" /></label>
+      <label>Last name<input formControlName="lastName" /></label>
+      <label>Email<input formControlName="email" /></label>
+      <label>Mobile<input formControlName="mobile" /></label>
+      <label>Status
+        <select formControlName="customerStatus">
+          <option value="active">active</option>
+          <option value="inactive">inactive</option>
+        </select>
+      </label>
+    </div>
+    <button class="button" type="submit">Save customer</button>
+  </form>
+}

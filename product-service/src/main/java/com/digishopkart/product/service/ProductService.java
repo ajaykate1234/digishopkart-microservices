@@ -2,6 +2,7 @@ package com.digishopkart.product.service;
 
 import com.digishopkart.common.exception.ConflictException;
 import com.digishopkart.common.exception.NotFoundException;
+import com.digishopkart.common.security.CurrentUser;
 import com.digishopkart.product.api.CatalogDtos.CatalogFacets;
 import com.digishopkart.product.api.CatalogDtos.FacetCount;
 import com.digishopkart.product.api.CatalogDtos.ImageResponse;
@@ -45,7 +46,14 @@ public class ProductService {
   }
 
   @Transactional(readOnly = true)
-  public List<ProductResponse> search(String q, List<String> categories, List<String> brands, BigDecimal minPrice, BigDecimal maxPrice) {
+  public List<ProductResponse> search(
+      String q,
+      List<String> categories,
+      List<String> brands,
+      BigDecimal minPrice,
+      BigDecimal maxPrice,
+      boolean includeInactive
+  ) {
     String query = q == null || q.isBlank() ? null : q.trim();
     List<String> categoryFilter = clean(categories);
     List<String> brandFilter = clean(brands);
@@ -57,7 +65,7 @@ public class ProductService {
         brandFilter.isEmpty() ? List.of("-") : brandFilter,
         minPrice,
         maxPrice,
-        "active");
+        includeInactive && (CurrentUser.hasRole("ADMIN") || CurrentUser.hasRole("STAFF")) ? null : "active");
     return withImages(found);
   }
 
@@ -102,6 +110,22 @@ public class ProductService {
     ProductEntity product = require(id);
     apply(product, request);
     return toResponse(product);
+  }
+
+  @Transactional
+  public void delete(Integer id) {
+    ProductEntity product = require(id);
+    images.deleteByProduct_Id(id);
+    product.getVariants().clear();
+    products.delete(product);
+  }
+
+  @Transactional
+  public void deleteVariant(Integer variantId) {
+    if (!variants.existsById(variantId)) {
+      throw new NotFoundException("Variant " + variantId + " was not found.");
+    }
+    variants.deleteById(variantId);
   }
 
   @Transactional(readOnly = true)
